@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <title>Classik Fragrances</title>
+    <!------------------------BOOTSTRAP CDN-------------------------->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <!-----------------------------BOOTSTRAP ICONS CDN---------------------------------->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!----------------------------------------CSS LINK--------------------------------------->
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+
+    <!--------------------------nav bar-------------------------->
+    <nav class="navbar navbar-expand-lg shadow-lg fixed-top">
+        <div class="container">
+            <!-- Left: Logo -->
+            <a class="navbar-brand" href="#"><img src="{% static 'images/logo.png' %}" alt="logo" style="width: 60px; height:60px;"></a>
+
+            <!-- Toggler for mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCenter" aria-controls="navbarNavCenter" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Collapsible Content -->
+            <div class="collapse navbar-collapse w-100 justify-content-between" id="navbarNavCenter">
+                <!-- Centered Nav Links -->
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+
+                <!-- Right: Cart + Login -->
+                <div class="d-flex align-items-center mt-2 mt-lg-0">
+                    <a href="{% url 'cart_view' %}" class="me-3 position-relative">
+                        <i class="bi bi-cart-fill" style="font-size: 1.4rem; color: #F84608"></i>
+                        {% if cart_item_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ cart_item_count }}
+                        </span>
+                        {% endif %}
+                    </a>                    
+                    <a href="{% url 'cart_view' %}" class="btn cart-btn btn-sm">View Cart</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!--------------------------------HERO SECTION------------------------------------->
+    <section class="hero_section">
+        <div class="container-fluid mt-5 px-4 px-md-5">
+            <div class="row align-items-center">
+                <!-- Hero Text -->
+                <div class="col-lg-7 col-md-9 col-sm-12">
+                    <h1 class="display-4 fw-bold mb-1 text-white">Discover Your <br><span class="display-4 fw-bold mb-1">Signature Scent</span></h1>
+                    <p class="mb-3 hero-text">Elegant. Classy. Timeless. Explore fragrances that define who you are . . .</p>
+                    <a href="#products" class="btn btn-lg btnn px-4">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!---------------------------------RECENT ARRIVALS---------------------------------->
+    <section class="recent-arrivals py-5">
+        <div class="container">
+            
+            <!-- Section Header -->
+            <div>
+                <h2 class="section-title text-center display-5 fw-bold mb-3">Recent Arrivals</h2>
+            </div>
+
+            <!-- Product Cards Row -->
+            <div class="row g-4">
+                <!-- Product * -->
+                 {% for product in recent_products %}
+                <div class="col-md-4">
+                    <div class="card product-card shadow-sm border-0">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="Perfume 1">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ product.name }}</h5>
+                            <p class="card-text text-muted small">{{ product.description|truncatewords:12 }}</p>
+                            {% if product.discount_price %}
+                                <p class="price fw-bold mb-2 text-success">
+                                    <del class="text-muted">₦{{ product.price }}</del> ₦{{ product.discount_price }}
+                                </p>
+                            {% else %}
+                                <p class="price fw-bold mb-2">₦{{ product.price }}</p>
+                            {% endif %}
+                            <button type="button" class="btn btn-sm w-100" data-bs-toggle="modal" data-bs-target="#recentModal{{ product.id }}">
+                                View Details
+                            </button>                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal for recent product -->
+                <div class="modal fade" id="recentModal{{ product.id }}" tabindex="-1" aria-labelledby="recentModalLabel{{ product.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="recentModalLabel{{ product.id }}">{{ product.name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body row">
+                                <div class="col-md-6">
+                                    <img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.name }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Category:</strong> {{ product.category }}</p>
+                                    <p><strong>Description:</strong> {{ product.description }}</p>
+                                    {% if product.discount_price %}
+                                    <p class="text-success fs-5 fw-bold">
+                                        <del class="text-muted">₦{{ product.price }}</del> ₦{{ product.discount_price }}
+                                    </p>
+                                    {% else %}
+                                    <p class="fs-5 fw-bold">₦{{ product.price }}</p>
+                                    {% endif %}
+                                    
+                                    <form class="add-to-cart-form" data-product-id="{{ product.id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-sm btnn w-100">
+                                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+        
+            </div>
+        </div>
+    </section>
+
+    <!----------------------------PRODUCTS---------------------------->
+    <section class="products-section" id="products">
+        <div class="container">
+            <!-- Section Heading -->
+            <div class="mb-1 mt-4">
+                <h2 class="fw-bold text-center display-5">Our Products</h2>
+            </div>
+            <p class="text-muted mt-2 fs-5 text-center">
+                Explore our latest collection of perfumes, body sprays, oils, and more.
+            </p>
+            <!-- Nav Tabs -->
+            <div class="d-flex justify-content-center gap-2 mb-2">
+                <ul class="nav nav-tabs mb-4" id="categoryTab" role="tablist">
+                {% for slug, data in category_products.items %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if forloop.first %}active{% endif %}" id="{{ slug }}-tab" data-bs-toggle="tab" data-bs-target="#{{ slug }}" type="button" role="tab">
+                            {{ data.name }}
+                        </button>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="categoryTabContent">
+            {% for slug, data in category_products.items %}
+                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ slug }}" role="tabpanel">
+                <div class="row">
+                    {% for product in data.products %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                {% if product.discount_price %}
+                                <p class="text-success mb-2 fw-bold">
+                                    <del class="text-muted">₦{{ product.price }}</del> ₦{{ product.discount_price }}
+                                </p>
+                                {% else %}
+                                <p class="fw-bold">₦{{ product.price }}</p>
+                                {% endif %}
+                                <button class="btn btn-sm btnn" data-bs-toggle="modal" data-bs-target="#modal{{ product.id }}">
+                                View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal{{ product.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title">{{ product.name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body row">
+                                    <div class="col-md-6"><img src="{{ product.image.url }}" class="img-fluid" alt=""></div>
+                                    <div class="col-md-6">
+                                        <p><strong>Category:</strong> {{ product.category }}</p>
+                                        <p><strong>Description:</strong> {{ product.description }}</p>
+                                        {% if product.discount_price %}
+                                        <p class="text-success fs-5 fw-bold">
+                                            <del class="text-muted">₦{{ product.price }}</del> ₦{{ product.discount_price }}
+                                        </p>
+                                        {% else %}
+                                        <p class="fs-5 fw-bold">₦{{ product.price }}</p>
+                                        {% endif %}
+                                        <form class="add-to-cart-form" data-product-id="{{ product.id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button class="btn btnn w-100">Add to Cart</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'category_products' slug %}" class="btn btn-sm btnn">View All Products</a>
+                </div>
+                </div>
+            {% endfor %}
+            </div>
+
+        </div>
+    </section>
+
+    <!-----------------Services------------------>
+    <div id="services" class="container py-5">
+        <div class="text-center mb-3">
+            <h2 class="fw-bold display-5 mt-5">Our Services</h2>
+        </div>
+
+        <div class="row justify-content-center">
+            <!-- Service 1 -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm text-center border-0">
+                    <div class="card-body">
+                        <i class="bi bi-truck fs-1 text-primaryy mb-3"></i>
+                        <h5 class="card-title fw-semibold">Fast Delivery</h5>
+                        <p class="card-text">Enjoy prompt delivery to your doorstep — safely and on time, no matter your location.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm text-center border-0">
+                <div class="card-body">
+                <i class="bi bi-gift fs-1 text-primaryy mb-3"></i>
+                <h5 class="card-title fw-semibold">Gift Packaging</h5>
+                <p class="card-text">Elegant gift wrapping options available for birthdays, weddings, and special occasions.</p>
+                </div>
+            </div>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm text-center border-0">
+                <div class="card-body">
+                <i class="bi bi-stars fs-1 text-primaryy mb-3"></i>
+                <h5 class="card-title fw-semibold">Authentic Fragrances</h5>
+                <p class="card-text">We deal in only original, long-lasting perfumes sourced from trusted global brands.</p>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-------------------------------------Contact Section--------------------------------->
+    <section id="contact" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-4 display-5">Get in Touch</h2>
+
+            <div class="row justify-content-center text-center">
+            <!-- Contact Info -->
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-semibold mb-3">Contact Details</h5>
+                <p><i class="bi bi-telephone-fill social-iconn me-2"></i> +234 803 154 6684</p>
+                <p><i class="bi bi-envelope-fill social-iconn me-2"></i> Classikfragrances@gmail.com</p>
+                <p><i class="bi bi-geo-alt-fill social-iconn me-2"></i> Lagos, Nigeria</p>
+            </div>
+
+            <!-- Social Links -->
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-semibold mb-3">Contact Us</h5>
+                <div class="d-flex justify-content-center gap-3">
+                <a href="https://www.tiktok.com/@classikfragrances5?_t=ZS-8xhXURYmyO7&_r=1" class="social-icon"><i class="bi bi-tiktok"></i></a>
+                <a href="https://www.instagram.com/classikfragrances?igsh=MWE2ZmNrOWV3aG00OA%3D%3D&utm_source=qr" class="social-icon"><i class="bi bi-instagram"></i></a>
+                <a href="https://www.facebook.com/share/19UpzCkYNh/?mibextid=wwXIfr" class="social-icon"><i class="bi bi-facebook"></i></a>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script>
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const productId = this.dataset.productId;
+                const quantity = this.querySelector('input[name="quantity"]').value;
+
+                fetch("{% url 'add_to_cart' %}", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: new URLSearchParams({
+                        'product_id': productId,
+                        'quantity': quantity
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert("Item added to cart!");
+                        // Optional: update cart icon or count
+                    } else {
+                        alert("Something went wrong.");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!--------------------------------BOOTSTRAP CDN--------------------------------->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+</body>
+</html>
